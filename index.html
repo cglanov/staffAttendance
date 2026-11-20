@@ -55,35 +55,6 @@
       height: 100vh;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 0 8px 24px;
-      border-bottom: 1px solid #1f2937;
-      margin-bottom: 20px;
-    }
-
-    .brand img {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      object-fit: cover;
-      background: #fff;
-    }
-
-    .brand-text {
-      font-size: 16px;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-
-    .brand-sub {
-      font-size: 12px;
-      color: #9ca3af;
-      font-weight: 400;
-    }
-
     .nav-list {
       display: flex;
       flex-direction: column;
@@ -223,8 +194,8 @@
       border-radius: 14px;
       padding: 18px 20px;
       margin-bottom: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
       gap: 16px;
       align-items: end;
     }
@@ -233,6 +204,21 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+      min-width: 220px;
+      flex: 1;
+      max-width: 300px;
+    }
+
+    .date-controls-group {
+      display: none;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: end;
+      flex: 2;
+    }
+
+    .date-controls-group.visible {
+      display: flex;
     }
 
     label {
@@ -296,7 +282,7 @@
     /* KPI Summary Grid */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
       gap: 16px;
       margin-bottom: 20px;
     }
@@ -317,7 +303,7 @@
     }
 
     .kpi-value {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 700;
       margin-top: 6px;
       color: var(--text);
@@ -561,6 +547,24 @@
       background: #f9fafb;
     }
 
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    th.sortable:hover {
+      background: #eef2f7;
+      color: var(--text);
+    }
+
+    .sort-arrow {
+      display: inline-block;
+      margin-left: 5px;
+      font-size: 11px;
+      color: var(--primary);
+    }
+
     td {
       padding: 11px 12px;
       border-bottom: 1px solid var(--border);
@@ -605,14 +609,6 @@
 
   <!-- Left Desktop Sidebar -->
   <aside>
-    <div class="brand">
-      <img src="icon.png" alt="Logo" onerror="this.style.display='none'" />
-      <div>
-        <div class="brand-text">Roster Analytics</div>
-        <div class="brand-sub">Attendance &amp; Staff Admin</div>
-      </div>
-    </div>
-
     <nav class="nav-list">
       <button class="nav-btn active" onclick="switchNav('person', this)">
         <span>&#128100;</span> Lookup by Staff Name
@@ -638,8 +634,7 @@
     <section id="panel-person" class="panel active">
       <div class="page-header">
         <div>
-          <h1 class="page-title">Individual Attendance History</h1>
-          <p class="page-desc">Inspect check-in patterns, total hours, and shift timelines for a specific staff member.</p>
+          <h1 class="page-title">Staff Attendance History</h1>
         </div>
 
         <div class="mode-switch">
@@ -650,23 +645,22 @@
 
       <div class="toolbar-card">
         <div class="field">
-          <label for="personSearch">Quick Filter</label>
-          <input type="search" id="personSearch" placeholder="Search first or last name..." oninput="populatePersonDropdown()" />
-        </div>
-        <div class="field">
           <label for="personSelect">Staff Member</label>
-          <select id="personSelect" onchange="renderPersonView()"></select>
+          <select id="personSelect" onchange="onPersonSelectChange()"></select>
         </div>
-        <div class="field">
-          <label for="personStartDate">From Date (Optional)</label>
-          <input type="date" id="personStartDate" onchange="renderPersonView()" />
-        </div>
-        <div class="field">
-          <label for="personEndDate">To Date (Optional)</label>
-          <input type="date" id="personEndDate" onchange="renderPersonView()" />
-        </div>
-        <div>
-          <button class="btn-secondary" onclick="clearPersonDates()">Reset Dates</button>
+
+        <div class="date-controls-group" id="personDateControls">
+          <div class="field">
+            <label for="personStartDate">From Date (Optional)</label>
+            <input type="date" id="personStartDate" onchange="renderPersonView()" />
+          </div>
+          <div class="field">
+            <label for="personEndDate">To Date (Optional)</label>
+            <input type="date" id="personEndDate" onchange="renderPersonView()" />
+          </div>
+          <div>
+            <button class="btn-secondary" onclick="clearPersonDates()">Reset Dates</button>
+          </div>
         </div>
       </div>
 
@@ -747,6 +741,10 @@
   let personMode = 'visual'; // 'visual' | 'raw'
   let dateMode = 'visual';     // 'visual' | 'raw'
 
+  // Raw table sort states
+  let personRawSort = { key: 'index', dir: 'desc' };
+  let dateRawSort = { key: 'time', dir: 'asc' };
+
   function getTodayISO() {
     const now = new Date();
     const offset = now.getTimezoneOffset() * 60000;
@@ -792,7 +790,6 @@
     return cmp !== 0 ? cmp : a.firstName.localeCompare(b.firstName, undefined, { sensitivity: 'base' });
   }
 
-  // Parse "YYYY-MM-DD" + "HH:MM:SS" into a JS Date object
   function parseTimestamp(dateStr, timeStr) {
     if (!dateStr || !timeStr) return null;
     const d = new Date(`${dateStr}T${timeStr}`);
@@ -807,11 +804,43 @@
     return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
   }
 
+  function timeToSeconds(timeStr) {
+    if (!timeStr) return null;
+    const parts = timeStr.split(':').map(Number);
+    if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1])) return null;
+    return parts[0] * 3600 + parts[1] * 60 + (parts[2] || 0);
+  }
+
+  function formatAverageTime(timeStrings) {
+    const validSecs = timeStrings
+      .map(timeToSeconds)
+      .filter(s => s !== null);
+
+    if (validSecs.length === 0) return '—';
+
+    const avgSecs = Math.round(validSecs.reduce((sum, s) => sum + s, 0) / validSecs.length);
+    const hrs24 = Math.floor(avgSecs / 3600) % 24;
+    const mins = Math.floor((avgSecs % 3600) / 60);
+    const period = hrs24 >= 12 ? 'PM' : 'AM';
+    const hrs12 = hrs24 % 12 === 0 ? 12 : hrs24 % 12;
+    return `${hrs12}:${String(mins).padStart(2, '0')} ${period}`;
+  }
+
+  // Full 24-hour percentage (for Daily Gantt view)
   function timeToDayPercent(timeStr) {
-    if (!timeStr) return 0;
-    const [h, m, s] = timeStr.split(':').map(Number);
-    const secs = (h || 0) * 3600 + (m || 0) * 60 + (s || 0);
+    const secs = timeToSeconds(timeStr);
+    if (secs === null) return 0;
     return Math.min(100, Math.max(0, (secs / 86400) * 100));
+  }
+
+  // 7:00 AM (25200s) to 7:00 PM (68400s) window percentage (43200s span)
+  function timeToShiftWindowPercent(timeStr) {
+    const secs = timeToSeconds(timeStr);
+    if (secs === null) return 0;
+    const windowStart = 7 * 3600;  // 7:00 AM
+    const windowEnd = 19 * 3600;   // 7:00 PM
+    const clamped = Math.min(windowEnd, Math.max(windowStart, secs));
+    return ((clamped - windowStart) / (windowEnd - windowStart)) * 100;
   }
 
   // Pair chronological SIGNED IN / SIGNED OUT logs into sessions
@@ -823,7 +852,6 @@
       const dt = parseTimestamp(log.date, log.time);
       if (log.action === 'SIGNED IN') {
         if (openIn) {
-          // Previous sign-in never had a sign-out before next sign-in
           sessions.push({
             date: openIn.date,
             inTime: openIn.time,
@@ -898,42 +926,68 @@
   }
 
   function populatePersonDropdown() {
-    const query = document.getElementById('personSearch').value.trim().toLowerCase();
     const select = document.getElementById('personSelect');
     const prev = select.value;
 
-    const matches = staffHistory.filter(p => {
-      if (!query) return true;
-      return (
-        p.firstName.toLowerCase().includes(query) ||
-        p.lastName.toLowerCase().includes(query) ||
-        `${p.firstName} ${p.lastName}`.toLowerCase().includes(query)
-      );
-    });
-
     select.innerHTML = '';
-    if (matches.length === 0) {
-      select.innerHTML = '<option value="">No matching staff</option>';
-      renderPersonView();
-      return;
-    }
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Choose a staff member...';
+    select.appendChild(placeholder);
 
-    matches.forEach(p => {
+    staffHistory.forEach(p => {
       const opt = document.createElement('option');
       opt.value = p.col;
       opt.textContent = `${p.lastName}, ${p.firstName}`;
       select.appendChild(opt);
     });
 
-    if (matches.some(m => String(m.col) === String(prev))) {
+    if (prev && staffHistory.some(m => String(m.col) === String(prev))) {
       select.value = prev;
     }
 
+    onPersonSelectChange();
+  }
+
+  function onPersonSelectChange() {
+    const colVal = document.getElementById('personSelect').value;
+    const dateControls = document.getElementById('personDateControls');
+    dateControls.classList.toggle('visible', Boolean(colVal));
     renderPersonView();
   }
 
   /* =========================================================
-     VIEW 1: BY PERSON (VISUAL OVERVIEW & RAW DATA)
+     RAW TABLE SORTING HELPERS
+     ========================================================= */
+  function togglePersonRawSort(key) {
+    if (personRawSort.key === key) {
+      personRawSort.dir = personRawSort.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+      personRawSort.key = key;
+      personRawSort.dir = 'asc';
+    }
+    renderPersonView();
+  }
+
+  function toggleDateRawSort(key) {
+    if (dateRawSort.key === key) {
+      dateRawSort.dir = dateRawSort.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+      dateRawSort.key = key;
+      dateRawSort.dir = 'asc';
+    }
+    renderDateView();
+  }
+
+  function renderSortIndicator(currentSort, key) {
+    if (currentSort.key !== key) return '<span class="sort-arrow" style="opacity:0.35;">&#8693;</span>';
+    return currentSort.dir === 'asc'
+      ? '<span class="sort-arrow">&#9650;</span>'
+      : '<span class="sort-arrow">&#9660;</span>';
+  }
+
+  /* =========================================================
+     VIEW 1: BY PERSON (VISUAL OVERVIEW & SORTABLE RAW DATA)
      ========================================================= */
   function renderPersonView() {
     const colVal = document.getElementById('personSelect').value;
@@ -945,7 +999,7 @@
     const person = staffHistory.find(p => String(p.col) === String(colVal));
     if (!person) {
       kpiEl.innerHTML = '';
-      contentEl.innerHTML = '<div class="card empty-state">Select a staff member above.</div>';
+      contentEl.innerHTML = '<div class="card empty-state">Select a staff member above to view attendance history and filter by date.</div>';
       return;
     }
 
@@ -959,7 +1013,12 @@
     const totalMs = sessions.reduce((acc, s) => acc + (s.durationMs || 0), 0);
     const completedSessions = sessions.filter(s => s.durationMs !== null);
     const avgMs = completedSessions.length > 0 ? totalMs / completedSessions.length : 0;
-    const signInCount = filteredLogs.filter(l => l.action === 'SIGNED IN').length;
+
+    const signInTimes = filteredLogs.filter(l => l.action === 'SIGNED IN').map(l => l.time);
+    const signOutTimes = filteredLogs.filter(l => l.action === 'SIGNED OUT').map(l => l.time);
+    const avgSignIn = formatAverageTime(signInTimes);
+    const avgSignOut = formatAverageTime(signOutTimes);
+
     const isIn = person.status === 'signed in';
 
     kpiEl.innerHTML = `
@@ -971,9 +1030,14 @@
         <div class="kpi-sub">${person.lastName}, ${person.firstName}</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Total Sign-Ins</div>
-        <div class="kpi-value">${signInCount}</div>
-        <div class="kpi-sub">${filteredLogs.length} total log entries</div>
+        <div class="kpi-label">Average Sign In</div>
+        <div class="kpi-value">${avgSignIn}</div>
+        <div class="kpi-sub">Across ${signInTimes.length} sign-ins</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Average Sign Out</div>
+        <div class="kpi-value">${avgSignOut}</div>
+        <div class="kpi-sub">Across ${signOutTimes.length} sign-outs</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Total Logged Time</div>
@@ -993,31 +1057,37 @@
     }
 
     if (personMode === 'raw') {
-      const reversedLogs = [...filteredLogs].reverse();
-      const rows = reversedLogs.map((l, idx) => `
+      const indexedLogs = filteredLogs.map((l, idx) => ({
+        index: idx + 1,
+        action: l.action,
+        date: l.date || '',
+        time: l.time || ''
+      }));
+
+      const mult = personRawSort.dir === 'asc' ? 1 : -1;
+      indexedLogs.sort((a, b) => {
+        if (personRawSort.key === 'index') return (a.index - b.index) * mult;
+        return String(a[personRawSort.key]).localeCompare(String(b[personRawSort.key])) * mult;
+      });
+
+      const rows = indexedLogs.map(l => `
         <tr>
-          <td>${reversedLogs.length - idx}</td>
+          <td>${l.index}</td>
           <td><span class="badge ${l.action === 'SIGNED IN' ? 'in' : 'out'}">${l.action}</span></td>
           <td>${l.date || '—'}</td>
           <td>${l.time || '—'}</td>
-          <td style="color:var(--muted); font-family:monospace;">${l.raw}</td>
         </tr>
       `).join('');
 
       contentEl.innerHTML = `
         <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Raw Spreadsheet Entries (${filteredLogs.length})</h2>
-            <button class="btn-secondary" onclick="exportPersonCsv()">Download CSV</button>
-          </div>
           <table>
             <thead>
               <tr>
-                <th>#</th>
-                <th>Event</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Raw Cell Value</th>
+                <th class="sortable" onclick="togglePersonRawSort('index')">#${renderSortIndicator(personRawSort, 'index')}</th>
+                <th class="sortable" onclick="togglePersonRawSort('action')">Event${renderSortIndicator(personRawSort, 'action')}</th>
+                <th class="sortable" onclick="togglePersonRawSort('date')">Date${renderSortIndicator(personRawSort, 'date')}</th>
+                <th class="sortable" onclick="togglePersonRawSort('time')">Time${renderSortIndicator(personRawSort, 'time')}</th>
               </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -1027,20 +1097,20 @@
       return;
     }
 
-    // VISUAL MODE: Daily Hours Bar Chart + Shift Timeline Cards
+    // VISUAL MODE: Daily Hours Bar Chart + 7:00 AM - 7:00 PM Shift Timeline Cards
     const dailyTotals = {};
     sessions.forEach(s => {
       if (!dailyTotals[s.date]) dailyTotals[s.date] = 0;
       dailyTotals[s.date] += (s.durationMs || 0);
     });
 
-    const sortedDates = Object.keys(dailyTotals).sort().slice(-14); // Last 14 active dates
+    const sortedDates = Object.keys(dailyTotals).sort().slice(-14);
     const maxHrs = Math.max(1, ...sortedDates.map(d => dailyTotals[d] / 3600000));
 
     const barsHtml = sortedDates.map(dateStr => {
       const hrs = dailyTotals[dateStr] / 3600000;
       const pct = Math.max(4, Math.round((hrs / maxHrs) * 100));
-      const shortDate = dateStr.slice(5); // MM-DD
+      const shortDate = dateStr.slice(5);
       return `
         <div class="bar-col">
           <div class="bar-val">${hrs > 0 ? hrs.toFixed(1) + 'h' : '—'}</div>
@@ -1052,10 +1122,10 @@
 
     const recentSessions = [...sessions].reverse();
     const sessionCardsHtml = recentSessions.map(s => {
-      const startPct = s.inTime ? timeToDayPercent(s.inTime) : 0;
+      const startPct = s.inTime ? timeToShiftWindowPercent(s.inTime) : 0;
       const endPct = (s.outTime && s.outTime.includes(':'))
-        ? timeToDayPercent(s.outTime)
-        : (s.ongoing ? timeToDayPercent(new Date().toTimeString().slice(0, 8)) : Math.min(100, startPct + 2));
+        ? timeToShiftWindowPercent(s.outTime)
+        : (s.ongoing ? timeToShiftWindowPercent(new Date().toTimeString().slice(0, 8)) : Math.min(100, startPct + 2));
       const widthPct = Math.max(2, endPct - startPct);
 
       return `
@@ -1088,7 +1158,7 @@
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">Shift Timeline (${sessions.length} ${sessions.length === 1 ? 'Session' : 'Sessions'})</h2>
-          <span style="font-size:12px; color:var(--muted);">Bar position represents 12:00 AM &ndash; 11:59 PM</span>
+          <span style="font-size:12px; color:var(--muted);">Bar position represents 7:00 AM &ndash; 7:00 PM</span>
         </div>
         <div class="session-list">${sessionCardsHtml}</div>
       </div>
@@ -1096,7 +1166,7 @@
   }
 
   /* =========================================================
-     VIEW 2: BY SPECIFIC DATE (24-HOUR GANTT & RAW DATA)
+     VIEW 2: BY SPECIFIC DATE (24-HOUR GANTT & SORTABLE RAW DATA)
      ========================================================= */
   function renderDateView() {
     const selectedDate = document.getElementById('datePicker').value;
@@ -1123,11 +1193,11 @@
 
       dayLogs.forEach(l => {
         rawEvents.push({
+          staff: `${person.lastName}, ${person.firstName}`,
           lastName: person.lastName,
           firstName: person.firstName,
           action: l.action,
-          time: l.time,
-          raw: l.raw
+          time: l.time
         });
       });
 
@@ -1140,7 +1210,7 @@
       });
     });
 
-    rawEvents.sort((a, b) => a.time.localeCompare(b.time));
+    const chronological = [...rawEvents].sort((a, b) => a.time.localeCompare(b.time));
 
     const totalSignIns = rawEvents.filter(e => e.action === 'SIGNED IN').length;
     const totalSignOuts = rawEvents.filter(e => e.action === 'SIGNED OUT').length;
@@ -1165,10 +1235,10 @@
       <div class="kpi-card">
         <div class="kpi-label">First / Last Activity</div>
         <div class="kpi-value" style="font-size:20px;">
-          ${rawEvents.length ? rawEvents[0].time.slice(0, 5) : '—'}
+          ${chronological.length ? chronological[0].time.slice(0, 5) : '—'}
         </div>
         <div class="kpi-sub">
-          ${rawEvents.length ? `Last event at ${rawEvents[rawEvents.length - 1].time.slice(0, 5)}` : 'No events'}
+          ${chronological.length ? `Last event at ${chronological[chronological.length - 1].time.slice(0, 5)}` : 'No events'}
         </div>
       </div>
     `;
@@ -1179,28 +1249,25 @@
     }
 
     if (dateMode === 'raw') {
+      const mult = dateRawSort.dir === 'asc' ? 1 : -1;
+      rawEvents.sort((a, b) => String(a[dateRawSort.key]).localeCompare(String(b[dateRawSort.key])) * mult);
+
       const rows = rawEvents.map(ev => `
         <tr>
           <td><strong>${ev.lastName}</strong>, ${ev.firstName}</td>
           <td><span class="badge ${ev.action === 'SIGNED IN' ? 'in' : 'out'}">${ev.action}</span></td>
           <td>${ev.time}</td>
-          <td style="color:var(--muted); font-family:monospace;">${ev.raw}</td>
         </tr>
       `).join('');
 
       contentEl.innerHTML = `
         <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Raw Event Log for ${selectedDate} (${rawEvents.length} Events)</h2>
-            <button class="btn-secondary" onclick="exportDateCsv()">Download CSV</button>
-          </div>
           <table>
             <thead>
               <tr>
-                <th>Staff Member</th>
-                <th>Event</th>
-                <th>Time</th>
-                <th>Raw Cell Value</th>
+                <th class="sortable" onclick="toggleDateRawSort('staff')">Staff Member${renderSortIndicator(dateRawSort, 'staff')}</th>
+                <th class="sortable" onclick="toggleDateRawSort('action')">Event${renderSortIndicator(dateRawSort, 'action')}</th>
+                <th class="sortable" onclick="toggleDateRawSort('time')">Time${renderSortIndicator(dateRawSort, 'time')}</th>
               </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -1248,38 +1315,6 @@
         <div>${ganttRowsHtml}</div>
       </div>
     `;
-  }
-
-  /* =========================================================
-     CSV EXPORTS FOR RAW DATA MODE
-     ========================================================= */
-  function downloadCsv(filename, rows) {
-    const csvContent = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    link.click();
-  }
-
-  function exportPersonCsv() {
-    const colVal = document.getElementById('personSelect').value;
-    const person = staffHistory.find(p => String(p.col) === String(colVal));
-    if (!person) return;
-    const rows = [['Last Name', 'First Name', 'Action', 'Date', 'Time', 'Raw Entry']];
-    person.logs.forEach(l => rows.push([person.lastName, person.firstName, l.action, l.date, l.time, l.raw]));
-    downloadCsv(`${person.lastName}_${person.firstName}_logs.csv`, rows);
-  }
-
-  function exportDateCsv() {
-    const selectedDate = document.getElementById('datePicker').value;
-    const rows = [['Date', 'Last Name', 'First Name', 'Action', 'Time', 'Raw Entry']];
-    staffHistory.forEach(p => {
-      p.logs.filter(l => l.date === selectedDate).forEach(l => {
-        rows.push([selectedDate, p.lastName, p.firstName, l.action, l.time, l.raw]);
-      });
-    });
-    downloadCsv(`attendance_${selectedDate}.csv`, rows);
   }
 
   /* =========================================================
