@@ -154,12 +154,6 @@
       font-weight: 700;
     }
 
-    .page-desc {
-      margin: 4px 0 0;
-      font-size: 14px;
-      color: var(--muted);
-    }
-
     /* View Mode Switcher (Visuals vs Raw Data) */
     .mode-switch {
       display: inline-flex;
@@ -229,7 +223,9 @@
       color: var(--muted);
     }
 
-    input, select {
+    input[type="text"],
+    input[type="date"],
+    select {
       padding: 10px 12px;
       font-size: 14px;
       border-radius: 9px;
@@ -239,7 +235,9 @@
       outline: none;
     }
 
-    input:focus, select:focus {
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    select:focus {
       border-color: var(--primary);
       background: #ffffff;
     }
@@ -260,7 +258,7 @@
     }
 
     .btn-primary {
-      padding: 12px 20px;
+      padding: 12px 22px;
       font-size: 14px;
       font-weight: 600;
       border-radius: 10px;
@@ -277,6 +275,99 @@
     .btn-primary:disabled {
       opacity: 0.55;
       cursor: not-allowed;
+    }
+
+    /* Multi-Row Add Staff Form */
+    .staff-rows-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .staff-entry-card {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #f9fafb;
+    }
+
+    .staff-entry-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 14px;
+      align-items: end;
+    }
+
+    .staff-entry-grid .field {
+      max-width: none;
+      min-width: 0;
+    }
+
+    .staff-entry-grid input[type="text"] {
+      background: #ffffff;
+    }
+
+    .remove-row-btn {
+      padding: 10px 12px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .remove-row-btn:hover {
+      color: #dc2626;
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
+
+    .duplicate-alert {
+      display: none;
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--amber-bg);
+      border: 1px solid #fcd34d;
+      color: #92400e;
+      font-size: 13px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .duplicate-alert.visible {
+      display: flex;
+    }
+
+    .duplicate-checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: none;
+      letter-spacing: 0;
+      color: #78350f;
+      cursor: pointer;
+    }
+
+    .duplicate-checkbox-label input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .form-actions-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     /* KPI Summary Grid */
@@ -469,68 +560,6 @@
       color: var(--text);
     }
 
-    /* 24-Hour Gantt Chart for Specific Date */
-    .gantt-header {
-      display: grid;
-      grid-template-columns: 180px 1fr 90px;
-      gap: 16px;
-      padding: 0 12px 10px;
-      border-bottom: 1px solid var(--border);
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-    }
-
-    .gantt-hours {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .gantt-row {
-      display: grid;
-      grid-template-columns: 180px 1fr 90px;
-      gap: 16px;
-      align-items: center;
-      padding: 12px;
-      border-bottom: 1px solid #f3f4f6;
-    }
-
-    .gantt-row:last-child {
-      border-bottom: none;
-    }
-
-    .gantt-name {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .gantt-bar-area {
-      position: relative;
-      height: 22px;
-      background: #f3f4f6;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .gantt-block {
-      position: absolute;
-      top: 3px;
-      height: 16px;
-      background: #16a34a;
-      border-radius: 4px;
-      min-width: 4px;
-    }
-
-    .gantt-block.ongoing {
-      background: #2563eb;
-    }
-
-    .gantt-total {
-      text-align: right;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
     /* Raw Data Table */
     table {
       width: 100%;
@@ -613,9 +642,6 @@
       <button class="nav-btn active" onclick="switchNav('person', this)">
         <span>&#128100;</span> Lookup by Staff Name
       </button>
-      <button class="nav-btn" onclick="switchNav('date', this)">
-        <span>&#128197;</span> Lookup by Date
-      </button>
       <button class="nav-btn" onclick="switchNav('add', this)">
         <span>&#10133;</span> Add New Staff
       </button>
@@ -668,65 +694,23 @@
       <div id="personContent"></div>
     </section>
 
-    <!-- SECTION 2: LOOKUP BY SPECIFIC DATE -->
-    <section id="panel-date" class="panel">
-      <div class="page-header">
-        <div>
-          <h1 class="page-title">Daily Attendance Breakdown</h1>
-          <p class="page-desc">View everyone who signed in or out on a chosen date along a 24-hour timeline.</p>
-        </div>
-
-        <div class="mode-switch">
-          <button class="mode-btn active" id="dateVisualBtn" onclick="setDateMode('visual')">Visual Timeline</button>
-          <button class="mode-btn" id="dateRawBtn" onclick="setDateMode('raw')">Raw Data Table</button>
-        </div>
-      </div>
-
-      <div class="toolbar-card">
-        <div class="field">
-          <label for="datePicker">Select Date</label>
-          <input type="date" id="datePicker" onchange="renderDateView()" />
-        </div>
-        <div class="field">
-          <label for="dateNameFilter">Filter Staff on This Date</label>
-          <input type="search" id="dateNameFilter" placeholder="Filter by first or last name..." oninput="renderDateView()" />
-        </div>
-        <div>
-          <button class="btn-secondary" onclick="setDateToday()">Jump to Today</button>
-        </div>
-      </div>
-
-      <div id="dateKpis" class="kpi-grid"></div>
-      <div id="dateContent"></div>
-    </section>
-
-    <!-- SECTION 3: ADD NEW STAFF -->
+    <!-- SECTION 2: ADD NEW STAFF -->
     <section id="panel-add" class="panel">
       <div class="page-header">
         <div>
           <h1 class="page-title">Manage Staff Roster</h1>
-          <p class="page-desc">Add new staff combinations to the <strong>all staff</strong> sheet and sync them to the active <strong>Roster</strong>.</p>
         </div>
       </div>
 
-      <div class="card" style="max-width: 620px;">
-        <div class="card-header">
-          <h2 class="card-title">Add New Person to &ldquo;all staff&rdquo;</h2>
-        </div>
+      <div class="card" style="max-width: 720px;">
+        <form id="addStaffForm" onsubmit="handleAddStaff(event)">
+          <div id="staffRowsList" class="staff-rows-list"></div>
 
-        <form onsubmit="handleAddStaff(event)">
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:18px;">
-            <div class="field">
-              <label for="newFirstName">First Name</label>
-              <input type="text" id="newFirstName" placeholder="e.g. Jordan" required autocomplete="off" />
-            </div>
-            <div class="field">
-              <label for="newLastName">Last Name</label>
-              <input type="text" id="newLastName" placeholder="e.g. Taylor" required autocomplete="off" />
-            </div>
+          <div class="form-actions-bar">
+            <button type="button" class="btn-secondary" onclick="addStaffRow()">+ Add Another Row</button>
+            <button type="submit" class="btn-primary" id="addStaffBtn">Update Roster</button>
           </div>
 
-          <button type="submit" class="btn-primary" id="addStaffBtn">Add to &ldquo;all staff&rdquo; &amp; Update Roster</button>
           <div id="addFeedback" class="feedback"></div>
         </form>
       </div>
@@ -739,23 +723,12 @@
 
   let staffHistory = [];
   let personMode = 'visual'; // 'visual' | 'raw'
-  let dateMode = 'visual';     // 'visual' | 'raw'
-
-  // Raw table sort states
   let personRawSort = { key: 'index', dir: 'desc' };
-  let dateRawSort = { key: 'time', dir: 'asc' };
 
   function getTodayISO() {
     const now = new Date();
     const offset = now.getTimezoneOffset() * 60000;
     return new Date(now - offset).toISOString().split('T')[0];
-  }
-
-  document.getElementById('datePicker').value = getTodayISO();
-
-  function setDateToday() {
-    document.getElementById('datePicker').value = getTodayISO();
-    renderDateView();
   }
 
   function clearPersonDates() {
@@ -776,13 +749,6 @@
     document.getElementById('personVisualBtn').classList.toggle('active', mode === 'visual');
     document.getElementById('personRawBtn').classList.toggle('active', mode === 'raw');
     renderPersonView();
-  }
-
-  function setDateMode(mode) {
-    dateMode = mode;
-    document.getElementById('dateVisualBtn').classList.toggle('active', mode === 'visual');
-    document.getElementById('dateRawBtn').classList.toggle('active', mode === 'raw');
-    renderDateView();
   }
 
   function sortByLastName(a, b) {
@@ -826,13 +792,6 @@
     return `${hrs12}:${String(mins).padStart(2, '0')} ${period}`;
   }
 
-  // Full 24-hour percentage (for Daily Gantt view)
-  function timeToDayPercent(timeStr) {
-    const secs = timeToSeconds(timeStr);
-    if (secs === null) return 0;
-    return Math.min(100, Math.max(0, (secs / 86400) * 100));
-  }
-
   // 7:00 AM (25200s) to 7:00 PM (68400s) window percentage (43200s span)
   function timeToShiftWindowPercent(timeStr) {
     const secs = timeToSeconds(timeStr);
@@ -843,7 +802,6 @@
     return ((clamped - windowStart) / (windowEnd - windowStart)) * 100;
   }
 
-  // Pair chronological SIGNED IN / SIGNED OUT logs into sessions
   function buildSessions(logs) {
     const sessions = [];
     let openIn = null;
@@ -914,7 +872,7 @@
       staffHistory = json.data.sort(sortByLastName);
       lastSynced.textContent = `Updated ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
       populatePersonDropdown();
-      renderDateView();
+      revalidateAllStaffRows();
     } catch (err) {
       lastSynced.textContent = 'Sync error';
       document.getElementById('personContent').innerHTML =
@@ -956,9 +914,6 @@
     renderPersonView();
   }
 
-  /* =========================================================
-     RAW TABLE SORTING HELPERS
-     ========================================================= */
   function togglePersonRawSort(key) {
     if (personRawSort.key === key) {
       personRawSort.dir = personRawSort.dir === 'asc' ? 'desc' : 'asc';
@@ -967,16 +922,6 @@
       personRawSort.dir = 'asc';
     }
     renderPersonView();
-  }
-
-  function toggleDateRawSort(key) {
-    if (dateRawSort.key === key) {
-      dateRawSort.dir = dateRawSort.dir === 'asc' ? 'desc' : 'asc';
-    } else {
-      dateRawSort.key = key;
-      dateRawSort.dir = 'asc';
-    }
-    renderDateView();
   }
 
   function renderSortIndicator(currentSort, key) {
@@ -1166,173 +1111,136 @@
   }
 
   /* =========================================================
-     VIEW 2: BY SPECIFIC DATE (24-HOUR GANTT & SORTABLE RAW DATA)
+     VIEW 2: MULTI-ROW ADD NEW STAFF + LIVE DUPLICATE CHECK
      ========================================================= */
-  function renderDateView() {
-    const selectedDate = document.getElementById('datePicker').value;
-    const query = document.getElementById('dateNameFilter').value.trim().toLowerCase();
-    const kpiEl = document.getElementById('dateKpis');
-    const contentEl = document.getElementById('dateContent');
-
-    if (!selectedDate) {
-      kpiEl.innerHTML = '';
-      contentEl.innerHTML = '<div class="card empty-state">Select a date above.</div>';
-      return;
-    }
-
-    const dailyPeople = [];
-    const rawEvents = [];
-
-    staffHistory.forEach(person => {
-      const full = `${person.firstName} ${person.lastName}`.toLowerCase();
-      const rev = `${person.lastName}, ${person.firstName}`.toLowerCase();
-      if (query && !full.includes(query) && !rev.includes(query)) return;
-
-      const dayLogs = person.logs.filter(l => l.date === selectedDate);
-      if (dayLogs.length === 0) return;
-
-      dayLogs.forEach(l => {
-        rawEvents.push({
-          staff: `${person.lastName}, ${person.firstName}`,
-          lastName: person.lastName,
-          firstName: person.firstName,
-          action: l.action,
-          time: l.time
-        });
-      });
-
-      const sessions = buildSessions(dayLogs);
-      const totalMs = sessions.reduce((acc, s) => acc + (s.durationMs || 0), 0);
-      dailyPeople.push({
-        person,
-        sessions,
-        totalMs
-      });
-    });
-
-    const chronological = [...rawEvents].sort((a, b) => a.time.localeCompare(b.time));
-
-    const totalSignIns = rawEvents.filter(e => e.action === 'SIGNED IN').length;
-    const totalSignOuts = rawEvents.filter(e => e.action === 'SIGNED OUT').length;
-    const combinedMs = dailyPeople.reduce((acc, p) => acc + p.totalMs, 0);
-
-    kpiEl.innerHTML = `
-      <div class="kpi-card">
-        <div class="kpi-label">Selected Date</div>
-        <div class="kpi-value" style="font-size:22px;">${selectedDate}</div>
-        <div class="kpi-sub">${dailyPeople.length} staff active</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Sign-Ins Recorded</div>
-        <div class="kpi-value">${totalSignIns}</div>
-        <div class="kpi-sub">${totalSignOuts} sign-outs recorded</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Combined Staff Hours</div>
-        <div class="kpi-value">${formatDuration(combinedMs)}</div>
-        <div class="kpi-sub">Total tracked duration</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">First / Last Activity</div>
-        <div class="kpi-value" style="font-size:20px;">
-          ${chronological.length ? chronological[0].time.slice(0, 5) : '—'}
-        </div>
-        <div class="kpi-sub">
-          ${chronological.length ? `Last event at ${chronological[chronological.length - 1].time.slice(0, 5)}` : 'No events'}
-        </div>
-      </div>
-    `;
-
-    if (rawEvents.length === 0) {
-      contentEl.innerHTML = `<div class="card empty-state">No sign-in or sign-out records found for ${selectedDate}.</div>`;
-      return;
-    }
-
-    if (dateMode === 'raw') {
-      const mult = dateRawSort.dir === 'asc' ? 1 : -1;
-      rawEvents.sort((a, b) => String(a[dateRawSort.key]).localeCompare(String(b[dateRawSort.key])) * mult);
-
-      const rows = rawEvents.map(ev => `
-        <tr>
-          <td><strong>${ev.lastName}</strong>, ${ev.firstName}</td>
-          <td><span class="badge ${ev.action === 'SIGNED IN' ? 'in' : 'out'}">${ev.action}</span></td>
-          <td>${ev.time}</td>
-        </tr>
-      `).join('');
-
-      contentEl.innerHTML = `
-        <div class="card">
-          <table>
-            <thead>
-              <tr>
-                <th class="sortable" onclick="toggleDateRawSort('staff')">Staff Member${renderSortIndicator(dateRawSort, 'staff')}</th>
-                <th class="sortable" onclick="toggleDateRawSort('action')">Event${renderSortIndicator(dateRawSort, 'action')}</th>
-                <th class="sortable" onclick="toggleDateRawSort('time')">Time${renderSortIndicator(dateRawSort, 'time')}</th>
-              </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
-        </div>
-      `;
-      return;
-    }
-
-    // VISUAL MODE: 24-Hour Horizontal Presence Timeline
-    const ganttRowsHtml = dailyPeople.map(({ person, sessions, totalMs }) => {
-      const blocksHtml = sessions.map(s => {
-        const startPct = s.inTime ? timeToDayPercent(s.inTime) : 0;
-        const endPct = (s.outTime && s.outTime.includes(':'))
-          ? timeToDayPercent(s.outTime)
-          : (s.ongoing ? timeToDayPercent(new Date().toTimeString().slice(0, 8)) : Math.min(100, startPct + 1.5));
-        const widthPct = Math.max(1.2, endPct - startPct);
-        const tooltip = `${s.inTime || '?'} → ${s.outTime || '?'}`;
-
-        return `<div class="gantt-block ${s.ongoing ? 'ongoing' : ''}" title="${tooltip}" style="left:${startPct}%; width:${widthPct}%;"></div>`;
-      }).join('');
-
-      return `
-        <div class="gantt-row">
-          <div class="gantt-name">${person.lastName}, ${person.firstName}</div>
-          <div class="gantt-bar-area">${blocksHtml}</div>
-          <div class="gantt-total">${totalMs > 0 ? formatDuration(totalMs) : 'Active'}</div>
-        </div>
-      `;
-    }).join('');
-
-    contentEl.innerHTML = `
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">24-Hour Presence Timeline (${selectedDate})</h2>
-          <span style="font-size:12px; color:var(--muted);">Hover over any green/blue block for exact times</span>
-        </div>
-        <div class="gantt-header">
-          <div>Staff Member</div>
-          <div class="gantt-hours">
-            <span>12a</span><span>4a</span><span>8a</span><span>12p</span><span>4p</span><span>8p</span><span>12a</span>
-          </div>
-          <div style="text-align:right;">Total</div>
-        </div>
-        <div>${ganttRowsHtml}</div>
-      </div>
-    `;
+  function isNameOnRoster(first, last) {
+    if (!first || !last) return false;
+    const f = first.trim().toLowerCase();
+    const l = last.trim().toLowerCase();
+    return staffHistory.some(
+      p => p.firstName.trim().toLowerCase() === f && p.lastName.trim().toLowerCase() === l
+    );
   }
 
-  /* =========================================================
-     ADD NEW STAFF TO 'all staff' & SYNC ROSTER
-     ========================================================= */
+  function addStaffRow() {
+    const list = document.getElementById('staffRowsList');
+    const rowEl = document.createElement('div');
+    rowEl.className = 'staff-entry-card';
+
+    rowEl.innerHTML = `
+      <div class="staff-entry-grid">
+        <div class="field">
+          <label>First Name</label>
+          <input type="text" class="first-name-input" placeholder="Penelope" required autocomplete="off" />
+        </div>
+        <div class="field">
+          <label>Last Name</label>
+          <input type="text" class="last-name-input" placeholder="Jones" required autocomplete="off" />
+        </div>
+        <button type="button" class="remove-row-btn" title="Remove row">Remove</button>
+      </div>
+      <div class="duplicate-alert">
+        <span>&#9888; <strong><span class="dup-name-display"></span></strong> is already on the staff roster.</span>
+        <label class="duplicate-checkbox-label">
+          <input type="checkbox" class="unique-person-checkbox" />
+          Is this a unique person with the same name?
+        </label>
+      </div>
+    `;
+
+    const firstInput = rowEl.querySelector('.first-name-input');
+    const lastInput = rowEl.querySelector('.last-name-input');
+    const removeBtn = rowEl.querySelector('.remove-row-btn');
+    const checkbox = rowEl.querySelector('.unique-person-checkbox');
+
+    firstInput.addEventListener('input', () => validateStaffRow(rowEl));
+    lastInput.addEventListener('input', () => validateStaffRow(rowEl));
+    checkbox.addEventListener('change', updateSubmitButtonState);
+
+    removeBtn.addEventListener('click', () => {
+      if (list.children.length > 1) {
+        rowEl.remove();
+        updateRemoveButtonsVisibility();
+        updateSubmitButtonState();
+      }
+    });
+
+    list.appendChild(rowEl);
+    updateRemoveButtonsVisibility();
+    updateSubmitButtonState();
+  }
+
+  function updateRemoveButtonsVisibility() {
+    const cards = document.querySelectorAll('#staffRowsList .staff-entry-card');
+    cards.forEach(card => {
+      const btn = card.querySelector('.remove-row-btn');
+      btn.style.visibility = cards.length > 1 ? 'visible' : 'hidden';
+    });
+  }
+
+  function validateStaffRow(rowEl) {
+    const first = rowEl.querySelector('.first-name-input').value.trim();
+    const last = rowEl.querySelector('.last-name-input').value.trim();
+    const alertBox = rowEl.querySelector('.duplicate-alert');
+    const nameDisplay = rowEl.querySelector('.dup-name-display');
+    const checkbox = rowEl.querySelector('.unique-person-checkbox');
+
+    const duplicate = isNameOnRoster(first, last);
+    if (duplicate) {
+      nameDisplay.textContent = `${first} ${last}`;
+      alertBox.classList.add('visible');
+    } else {
+      alertBox.classList.remove('visible');
+      checkbox.checked = false;
+    }
+    updateSubmitButtonState();
+  }
+
+  function revalidateAllStaffRows() {
+    document.querySelectorAll('#staffRowsList .staff-entry-card').forEach(validateStaffRow);
+  }
+
+  function updateSubmitButtonState() {
+    const submitBtn = document.getElementById('addStaffBtn');
+    const cards = document.querySelectorAll('#staffRowsList .staff-entry-card');
+    let hasUnconfirmedDuplicate = false;
+
+    cards.forEach(card => {
+      const alertVisible = card.querySelector('.duplicate-alert').classList.contains('visible');
+      const checked = card.querySelector('.unique-person-checkbox').checked;
+      if (alertVisible && !checked) {
+        hasUnconfirmedDuplicate = true;
+      }
+    });
+
+    submitBtn.disabled = hasUnconfirmedDuplicate;
+  }
+
   async function handleAddStaff(e) {
     e.preventDefault();
-    const firstInput = document.getElementById('newFirstName');
-    const lastInput = document.getElementById('newLastName');
+    const cards = document.querySelectorAll('#staffRowsList .staff-entry-card');
     const btn = document.getElementById('addStaffBtn');
     const feedback = document.getElementById('addFeedback');
 
-    const firstName = firstInput.value.trim();
-    const lastName = lastInput.value.trim();
-    if (!firstName || !lastName) return;
+    const staffList = [];
+    for (const card of cards) {
+      const firstName = card.querySelector('.first-name-input').value.trim();
+      const lastName = card.querySelector('.last-name-input').value.trim();
+      const isDuplicate = card.querySelector('.duplicate-alert').classList.contains('visible');
+      const allowDuplicate = card.querySelector('.unique-person-checkbox').checked;
+
+      if (!firstName || !lastName) return;
+      if (isDuplicate && !allowDuplicate) {
+        feedback.className = 'feedback error';
+        feedback.textContent = `Please confirm whether ${firstName} ${lastName} is a unique person with the same name.`;
+        return;
+      }
+
+      staffList.push({ firstName, lastName, allowDuplicate });
+    }
 
     btn.disabled = true;
-    btn.textContent = 'Adding & Syncing Roster...';
+    btn.textContent = 'Updating Roster...';
     feedback.className = 'feedback';
 
     try {
@@ -1341,8 +1249,7 @@
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
           action: 'addStaff',
-          firstName: firstName,
-          lastName: lastName
+          staffList: staffList
         })
       });
       const json = await res.json();
@@ -1350,18 +1257,24 @@
 
       feedback.className = 'feedback success';
       feedback.textContent = json.message;
-      firstInput.value = '';
-      lastInput.value = '';
+
+      // Reset form back to a single clean row
+      const list = document.getElementById('staffRowsList');
+      list.innerHTML = '';
+      addStaffRow();
+
       await loadHistoryData();
     } catch (err) {
       feedback.className = 'feedback error';
       feedback.textContent = err.message;
     } finally {
-      btn.disabled = false;
-      btn.textContent = 'Add to "all staff" & Update Roster';
+      btn.textContent = 'Update Roster';
+      updateSubmitButtonState();
     }
   }
 
+  // Initialize first row and load spreadsheet history
+  addStaffRow();
   loadHistoryData();
 </script>
 </body>
