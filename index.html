@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Staff Logs & Admin</title>
+
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Staff Admin" />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <link rel="manifest" href="manifest.json" />
+
+  <style>
+    :root {
+      --bg: #f2f2f7;
+      --card: #ffffff;
+      --primary: #007aff;
+      --green: #34c759;
+      --green-bg: #e8f8ed;
+      --orange: #ff9500;
+      --orange-bg: #fff3e0;
+      --text: #1c1c1e;
+      --muted: #6e6e73;
+      --border: #d1d1d6;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    header {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px 20px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .refresh-btn {
+      padding: 10px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      background: var(--bg);
+      color: var(--primary);
+      cursor: pointer;
+    }
+
+    .refresh-btn:disabled {
+      opacity: 0.5;
+    }
+
+    /* Navigation Tabs */
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: var(--bg);
+      padding: 4px;
+      border-radius: 12px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      padding: 10px 8px;
+      border: none;
+      background: transparent;
+      border-radius: 9px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--card);
+      color: var(--text);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    input, select {
+      padding: 12px 14px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    .primary-btn {
+      padding: 14px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 12px;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .clear-btn {
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      align-self: flex-end;
+    }
+
+    /* Summary Banner */
+    .summary-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--bg);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .person-title {
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge.in {
+      background: var(--green-bg);
+      color: #155724;
+    }
+
+    .badge.out {
+      background: var(--orange-bg);
+      color: #856404;
+    }
+
+    /* Logs Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--bg);
+      font-size: 15px;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 32px 16px;
+      font-size: 16px;
+    }
+
+    .feedback {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      display: none;
+    }
+
+    .feedback.success {
+      display: block;
+      background: var(--green-bg);
+      color: #155724;
+    }
+
+    .feedback.error {
+      display: block;
+      background: #fdecea;
+      color: #b71c1c;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="header-top">
+      <h1>Staff Logs &amp; Roster Admin</h1>
+      <button class="refresh-btn" id="refreshBtn" onclick="loadHistoryData()">Refresh Data</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('person', this)">Lookup by Name</button>
+      <button class="tab-btn" onclick="switchTab('date', this)">Lookup by Date</button>
+      <button class="tab-btn" onclick="switchTab('add', this)">Add New Staff</button>
+    </div>
+  </header>
+
+  <!-- TAB 1: LOOKUP BY PERSON -->
+  <section id="panel-person" class="panel active">
+    <div class="card">
+      <div class="controls-row">
+        <div class="field-group">
+          <label for="personSearch">Filter Name</label>
+          <input type="search" id="personSearch" placeholder="Type first or last name..." oninput="populatePersonDropdown()" />
+        </div>
+        <div class="field-group">
+          <label for="personSelect">Select Staff Member</label>
+          <select id="personSelect" onchange="renderPersonLogs()"></select>
+        </div>
+        <div class="field-group">
+          <label for="personDateFilter">Optional Date Filter</label>
+          <input type="date" id="personDateFilter" onchange="renderPersonLogs()" />
+        </div>
+        <button class="clear-btn" onclick="document.getElementById('personDateFilter').value=''; renderPersonLogs();">All Dates</button>
+      </div>
+
+      <div id="personSummary"></div>
+      <div id="personLogsContainer"></div>
+    </div>
+  </section>
+
+  <!-- TAB 2: LOOKUP BY SPECIFIC DATE -->
+  <section id="panel-date" class="panel">
+    <div class="card">
+      <div class="controls-row">
+        <div class="field-group">
+          <label for="datePicker">Select Date</label>
+          <input type="date" id="datePicker" onchange="renderDateLogs()" />
+        </div>
+        <div class="field-group">
+          <label for="dateNameFilter">Filter Name on This Date</label>
+          <input type="search" id="dateNameFilter" placeholder="Optional name filter..." oninput="renderDateLogs()" />
+        </div>
+      </div>
+
+      <div id="dateSummary"></div>
+      <div id="dateLogsContainer"></div>
+    </div>
+  </section>
+
+  <!-- TAB 3: ADD NEW STAFF -->
+  <section id="panel-add" class="panel">
+    <div class="card">
+      <h2 style="margin-top:0; font-size:18px;">Add Staff to &ldquo;all staff&rdquo; &amp; Update Roster</h2>
+      <p style="color:var(--muted); font-size:15px; margin-top:4px;">
+        Adds the person to the <strong>all staff</strong> tab and automatically updates and formats the <strong>Roster</strong> tab without erasing existing logs.
+      </p>
+
+      <form id="addStaffForm" onsubmit="handleAddStaff(event)">
+        <div class="controls-row">
+          <div class="field-group">
+            <label for="newFirstName">First Name</label>
+            <input type="text" id="newFirstName" placeholder="e.g. Jordan" required autocomplete="off" />
+          </div>
+          <div class="field-group">
+            <label for="newLastName">Last Name</label>
+            <input type="text" id="newLastName" placeholder="e.g. Taylor" required autocomplete="off" />
+          </div>
+        </div>
+
+        <button type="submit" class="primary-btn" id="addStaffBtn">Add Staff &amp; Sync Roster</button>
+        <div id="addFeedback" class="feedback"></div>
+      </form>
+    </div>
+  </section>
+</div>
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzuBXmj7Ou8PMjbP298Rd4sX1qEgOBUJQRZHX46XQYVF2GfSxcNSVdKQGdKovsHCc4EHw/exec';
+
+  let staffHistory = [];
+
+  // Default date picker to today's local date (YYYY-MM-DD)
+  function getTodayISO() {
+    const now = new Date();
+    const offset = now.getTimezoneOffset() * 60000;
+    return new Date(now - offset).toISOString().split('T')[0];
+  }
+
+  document.getElementById('datePicker').value = getTodayISO();
+
+  function switchTab(tabName, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`panel-${tabName}`).classList.add('active');
+  }
+
+  function sortByLastName(a, b) {
+    const lastCmp = a.lastName.localeCompare(b.lastName, undefined, { sensitivity: 'base' });
+    if (lastCmp !== 0) return lastCmp;
+    return a.firstName.localeCompare(b.firstName, undefined, { sensitivity: 'base' });
+  }
+
+  async function loadHistoryData() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    refreshBtn.disabled = true;
+    refreshBtn.textContent = 'Loading...';
+
+    try {
+      const res = await fetch(`${SCRIPT_URL}?action=history`);
+      const json = await res.json();
+      if (json.status !== 'success') throw new Error(json.message || 'Failed to load data');
+
+      staffHistory = json.data.sort(sortByLastName);
+      populatePersonDropdown();
+      renderDateLogs();
+    } catch (err) {
+      document.getElementById('personLogsContainer').innerHTML =
+        `<div class="empty-state">Error loading spreadsheet: ${err.message}</div>`;
+      console.error(err);
+    } finally {
+      refreshBtn.disabled = false;
+      refreshBtn.textContent = 'Refresh Data';
+    }
+  }
+
+  function populatePersonDropdown() {
+    const query = document.getElementById('personSearch').value.trim().toLowerCase();
+    const select = document.getElementById('personSelect');
+    const previousCol = select.value;
+
+    const matches = staffHistory.filter(p => {
+      if (!query) return true;
+      return (
+        p.firstName.toLowerCase().includes(query) ||
+        p.lastName.toLowerCase().includes(query) ||
+        `${p.firstName} ${p.lastName}`.toLowerCase().includes(query)
+      );
+    });
+
+    select.innerHTML = '';
+    if (matches.length === 0) {
+      const opt = document.createElement('option');
+      opt.textContent = 'No matching staff';
+      opt.value = '';
+      select.appendChild(opt);
+      renderPersonLogs();
+      return;
+    }
+
+    matches.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.col;
+      opt.textContent = `${p.lastName}, ${p.firstName}`;
+      select.appendChild(opt);
+    });
+
+    if (matches.some(m => String(m.col) === String(previousCol))) {
+      select.value = previousCol;
+    }
+
+    renderPersonLogs();
+  }
+
+  function renderPersonLogs() {
+    const colVal = document.getElementById('personSelect').value;
+    const dateFilter = document.getElementById('personDateFilter').value;
+    const summaryEl = document.getElementById('personSummary');
+    const containerEl = document.getElementById('personLogsContainer');
+
+    const person = staffHistory.find(p => String(p.col) === String(colVal));
+    if (!person) {
+      summaryEl.innerHTML = '';
+      containerEl.innerHTML = '<div class="empty-state">Select a staff member to view history.</div>';
+      return;
+    }
+
+    const isIn = person.status === 'signed in';
+    let logs = [...person.logs].reverse(); // Most recent first
+    if (dateFilter) {
+      logs = logs.filter(l => l.date === dateFilter);
+    }
+
+    summaryEl.innerHTML = `
+      <div class="summary-bar">
+        <div>
+          <div class="person-title">${person.lastName}, ${person.firstName}</div>
+          <div style="font-size:13px; color:var(--muted); margin-top:2px;">
+            Showing ${logs.length} ${logs.length === 1 ? 'event' : 'events'}${dateFilter ? ` on ${dateFilter}` : ' total'}
+          </div>
+        </div>
+        <span class="badge ${isIn ? 'in' : 'out'}">Currently ${person.status}</span>
+      </div>
+    `;
+
+    if (logs.length === 0) {
+      containerEl.innerHTML = '<div class="empty-state">No sign-in or sign-out records found for this selection.</div>';
+      return;
+    }
+
+    let rowsHtml = logs.map(log => {
+      const badgeClass = log.action === 'SIGNED IN' ? 'in' : 'out';
+      return `
+        <tr>
+          <td><span class="badge ${badgeClass}">${log.action}</span></td>
+          <td>${log.date || '—'}</td>
+          <td>${log.time || log.raw}</td>
+        </tr>
+      `;
+    }).join('');
+
+    containerEl.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Action</th>
+            <th>Date</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    `;
+  }
+
+  function renderDateLogs() {
+    const selectedDate = document.getElementById('datePicker').value;
+    const nameQuery = document.getElementById('dateNameFilter').value.trim().toLowerCase();
+    const summaryEl = document.getElementById('dateSummary');
+    const containerEl = document.getElementById('dateLogsContainer');
+
+    if (!selectedDate) {
+      summaryEl.innerHTML = '';
+      containerEl.innerHTML = '<div class="empty-state">Choose a date above to view activity.</div>';
+      return;
+    }
+
+    const events = [];
+    staffHistory.forEach(person => {
+      const fullName = `${person.firstName} ${person.lastName}`.toLowerCase();
+      const revName = `${person.lastName}, ${person.firstName}`.toLowerCase();
+      if (nameQuery && !fullName.includes(nameQuery) && !revName.includes(nameQuery)) {
+        return;
+      }
+
+      person.logs.forEach(log => {
+        if (log.date === selectedDate) {
+          events.push({
+            lastName: person.lastName,
+            firstName: person.firstName,
+            action: log.action,
+            time: log.time
+          });
+        }
+      });
+    });
+
+    // Sort chronologically by time
+    events.sort((a, b) => a.time.localeCompare(b.time));
+
+    const uniquePeopleCount = new Set(events.map(e => `${e.lastName}|${e.firstName}`)).size;
+
+    summaryEl.innerHTML = `
+      <div class="summary-bar">
+        <div>
+          <div class="person-title">Activity for ${selectedDate}</div>
+          <div style="font-size:13px; color:var(--muted); margin-top:2px;">
+            ${events.length} total ${events.length === 1 ? 'event' : 'events'} across ${uniquePeopleCount} ${uniquePeopleCount === 1 ? 'person' : 'people'}
+          </div>
+        </div>
+      </div>
+    `;
+
+    if (events.length === 0) {
+      containerEl.innerHTML = `<div class="empty-state">No sign-ins or sign-outs recorded on ${selectedDate}.</div>`;
+      return;
+    }
+
+    const rowsHtml = events.map(ev => {
+      const badgeClass = ev.action === 'SIGNED IN' ? 'in' : 'out';
+      return `
+        <tr>
+          <td><strong>${ev.lastName}</strong>, ${ev.firstName}</td>
+          <td><span class="badge ${badgeClass}">${ev.action}</span></td>
+          <td>${ev.time}</td>
+        </tr>
+      `;
+    }).join('');
+
+    containerEl.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Staff Member</th>
+            <th>Action</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    `;
+  }
+
+  async function handleAddStaff(e) {
+    e.preventDefault();
+    const firstInput = document.getElementById('newFirstName');
+    const lastInput = document.getElementById('newLastName');
+    const btn = document.getElementById('addStaffBtn');
+    const feedback = document.getElementById('addFeedback');
+
+    const firstName = firstInput.value.trim();
+    const lastName = lastInput.value.trim();
+    if (!firstName || !lastName) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Adding & Syncing Roster...';
+    feedback.className = 'feedback';
+    feedback.textContent = '';
+
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'addStaff',
+          firstName: firstName,
+          lastName: lastName
+        })
+      });
+      const json = await res.json();
+      if (json.status !== 'success') throw new Error(json.message);
+
+      feedback.className = 'feedback success';
+      feedback.textContent = json.message;
+      firstInput.value = '';
+      lastInput.value = '';
+
+      // Reload history so the new person immediately appears in dropdowns
+      await loadHistoryData();
+    } catch (err) {
+      feedback.className = 'feedback error';
+      feedback.textContent = err.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Add Staff & Sync Roster';
+    }
+  }
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+
+  loadHistoryData();
+</script>
+</body>
+</html>
