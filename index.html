@@ -2,111 +2,162 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Staff Logs & Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff Attendance &amp; Roster Admin</title>
 
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Staff Admin" />
+  <!-- Browser Tab Favicon & App Icon -->
+  <link rel="icon" type="image/png" href="icon.png" />
+  <link rel="shortcut icon" type="image/png" href="icon.png" />
   <link rel="apple-touch-icon" href="icon.png" />
-  <link rel="manifest" href="manifest.json" />
 
   <style>
     :root {
-      --bg: #f2f2f7;
+      --bg: #f4f6f9;
+      --sidebar: #111827;
+      --sidebar-hover: #1f2937;
+      --sidebar-active: #2563eb;
       --card: #ffffff;
-      --primary: #007aff;
-      --green: #34c759;
-      --green-bg: #e8f8ed;
-      --orange: #ff9500;
-      --orange-bg: #fff3e0;
-      --text: #1c1c1e;
-      --muted: #6e6e73;
-      --border: #d1d1d6;
+      --primary: #2563eb;
+      --primary-soft: #eff6ff;
+      --green: #16a34a;
+      --green-bg: #dcfce7;
+      --amber: #d97706;
+      --amber-bg: #fef3c7;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
     }
 
     * {
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
     }
 
     body {
       margin: 0;
       background: var(--bg);
       color: var(--text);
+      display: flex;
+      min-height: 100vh;
     }
 
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-
-    header {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 16px 20px;
-      border: 1px solid var(--border);
-      margin-bottom: 16px;
+    /* Desktop Sidebar */
+    aside {
+      width: 260px;
+      background: var(--sidebar);
+      color: #f9fafb;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      padding: 24px 16px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
     }
 
-    .header-top {
+    .brand {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 12px;
+      padding: 0 8px 24px;
+      border-bottom: 1px solid #1f2937;
+      margin-bottom: 20px;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 22px;
+    .brand img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #fff;
+    }
+
+    .brand-text {
+      font-size: 16px;
       font-weight: 700;
+      line-height: 1.2;
     }
 
-    .refresh-btn {
-      padding: 10px 16px;
-      font-size: 15px;
-      font-weight: 600;
+    .brand-sub {
+      font-size: 12px;
+      color: #9ca3af;
+      font-weight: 400;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px 14px;
+      border: none;
       border-radius: 10px;
-      border: none;
-      background: var(--bg);
-      color: var(--primary);
-      cursor: pointer;
-    }
-
-    .refresh-btn:disabled {
-      opacity: 0.5;
-    }
-
-    /* Navigation Tabs */
-    .tabs {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      background: var(--bg);
-      padding: 4px;
-      border-radius: 12px;
-      gap: 4px;
-    }
-
-    .tab-btn {
-      padding: 10px 8px;
-      border: none;
       background: transparent;
-      border-radius: 9px;
-      font-size: 15px;
+      color: #d1d5db;
+      font-size: 14px;
       font-weight: 600;
-      color: var(--muted);
+      text-align: left;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background 0.15s, color 0.15s;
     }
 
-    .tab-btn.active {
-      background: var(--card);
-      color: var(--text);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    .nav-btn:hover {
+      background: var(--sidebar-hover);
+      color: #ffffff;
+    }
+
+    .nav-btn.active {
+      background: var(--sidebar-active);
+      color: #ffffff;
+    }
+
+    .sync-box {
+      padding-top: 16px;
+      border-top: 1px solid #1f2937;
+    }
+
+    .sync-btn {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid #374151;
+      background: #1f2937;
+      color: #f9fafb;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .sync-btn:hover {
+      background: #374151;
+    }
+
+    .sync-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .last-synced {
+      font-size: 11px;
+      color: #9ca3af;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* Main Workspace */
+    main {
+      flex: 1;
+      padding: 28px 36px;
+      max-width: 1400px;
+      overflow-y: auto;
     }
 
     .panel {
@@ -117,103 +168,194 @@
       display: block;
     }
 
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-
-    .controls-row {
+    .page-header {
       display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 16px;
     }
 
-    .field-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      flex: 1;
-      min-width: 200px;
+    .page-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
     }
 
-    label {
+    .page-desc {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* View Mode Switcher (Visuals vs Raw Data) */
+    .mode-switch {
+      display: inline-flex;
+      background: #e5e7eb;
+      padding: 4px;
+      border-radius: 10px;
+      gap: 4px;
+    }
+
+    .mode-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
       font-size: 13px;
       font-weight: 600;
       color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .mode-btn.active {
+      background: #ffffff;
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* Filter Toolbar Card */
+    .toolbar-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      align-items: end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.4px;
+      color: var(--muted);
     }
 
     input, select {
-      padding: 12px 14px;
-      font-size: 16px;
-      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      border-radius: 9px;
       border: 1px solid var(--border);
-      background: var(--bg);
+      background: #f9fafb;
       color: var(--text);
       outline: none;
     }
 
     input:focus, select:focus {
       border-color: var(--primary);
-      background: #fff;
+      background: #ffffff;
     }
 
-    .primary-btn {
-      padding: 14px 20px;
-      font-size: 16px;
+    .btn-secondary {
+      padding: 10px 14px;
+      font-size: 13px;
       font-weight: 600;
-      border-radius: 12px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: #f9fafb;
+    }
+
+    .btn-primary {
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 10px;
       border: none;
       background: var(--primary);
-      color: #fff;
+      color: #ffffff;
       cursor: pointer;
-      width: 100%;
     }
 
-    .primary-btn:disabled {
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-primary:disabled {
       opacity: 0.55;
       cursor: not-allowed;
     }
 
-    .clear-btn {
-      padding: 12px 16px;
-      font-size: 15px;
-      font-weight: 600;
-      border-radius: 10px;
-      border: 1px solid var(--border);
+    /* KPI Summary Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .kpi-card {
       background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 700;
+      margin-top: 6px;
       color: var(--text);
-      cursor: pointer;
-      align-self: flex-end;
     }
 
-    /* Summary Banner */
-    .summary-bar {
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Content Cards */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      padding: 14px 16px;
-      background: var(--bg);
-      border-radius: 12px;
-      margin-bottom: 16px;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
     }
 
-    .person-title {
-      font-size: 19px;
+    .card-title {
+      margin: 0;
+      font-size: 16px;
       font-weight: 700;
     }
 
     .badge {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       padding: 4px 10px;
-      border-radius: 8px;
+      border-radius: 999px;
       font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
@@ -221,15 +363,189 @@
 
     .badge.in {
       background: var(--green-bg);
-      color: #155724;
+      color: var(--green);
     }
 
     .badge.out {
-      background: var(--orange-bg);
-      color: #856404;
+      background: var(--amber-bg);
+      color: var(--amber);
     }
 
-    /* Logs Table */
+    .badge.active-now {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    /* Visual Bar Chart (Daily Hours) */
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      height: 190px;
+      padding: 24px 12px 8px;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 58px;
+      flex: 1;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .bar-val {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .bar-fill {
+      width: 100%;
+      max-width: 42px;
+      background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+      border-radius: 6px 6px 0 0;
+      min-height: 6px;
+      transition: height 0.3s ease;
+    }
+
+    .bar-date {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+      white-space: nowrap;
+    }
+
+    /* Visual Shift Timeline Cards */
+    .session-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .session-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 110px;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+    }
+
+    .session-date {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .session-track-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .session-times {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .timeline-rail {
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .timeline-segment {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      background: var(--green);
+      border-radius: 999px;
+    }
+
+    .timeline-segment.ongoing {
+      background: var(--primary);
+    }
+
+    .session-duration {
+      text-align: right;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    /* 24-Hour Gantt Chart for Specific Date */
+    .gantt-header {
+      display: grid;
+      grid-template-columns: 180px 1fr 90px;
+      gap: 16px;
+      padding: 0 12px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .gantt-hours {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .gantt-row {
+      display: grid;
+      grid-template-columns: 180px 1fr 90px;
+      gap: 16px;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .gantt-row:last-child {
+      border-bottom: none;
+    }
+
+    .gantt-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .gantt-bar-area {
+      position: relative;
+      height: 22px;
+      background: #f3f4f6;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .gantt-block {
+      position: absolute;
+      top: 3px;
+      height: 16px;
+      background: #16a34a;
+      border-radius: 4px;
+      min-width: 4px;
+    }
+
+    .gantt-block.ongoing {
+      background: #2563eb;
+    }
+
+    .gantt-total {
+      text-align: right;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* Raw Data Table */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -241,140 +557,196 @@
       text-transform: uppercase;
       color: var(--muted);
       padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 2px solid var(--border);
+      background: #f9fafb;
     }
 
     td {
-      padding: 12px;
-      border-bottom: 1px solid var(--bg);
-      font-size: 15px;
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
     }
 
-    tr:last-child td {
-      border-bottom: none;
+    tr:hover td {
+      background: #f9fafb;
     }
 
     .empty-state {
       text-align: center;
+      padding: 40px 20px;
       color: var(--muted);
-      padding: 32px 16px;
-      font-size: 16px;
+      font-size: 15px;
     }
 
     .feedback {
-      margin-top: 14px;
-      padding: 12px 14px;
+      margin-top: 16px;
+      padding: 12px 16px;
       border-radius: 10px;
-      font-size: 15px;
-      font-weight: 500;
+      font-size: 14px;
+      font-weight: 600;
       display: none;
     }
 
     .feedback.success {
       display: block;
       background: var(--green-bg);
-      color: #155724;
+      color: var(--green);
     }
 
     .feedback.error {
       display: block;
-      background: #fdecea;
-      color: #b71c1c;
+      background: #fee2e2;
+      color: #b91c1c;
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <header>
-    <div class="header-top">
-      <h1>Staff Logs &amp; Roster Admin</h1>
-      <button class="refresh-btn" id="refreshBtn" onclick="loadHistoryData()">Refresh Data</button>
+  <!-- Left Desktop Sidebar -->
+  <aside>
+    <div class="brand">
+      <img src="icon.png" alt="Logo" onerror="this.style.display='none'" />
+      <div>
+        <div class="brand-text">Roster Analytics</div>
+        <div class="brand-sub">Attendance &amp; Staff Admin</div>
+      </div>
     </div>
 
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('person', this)">Lookup by Name</button>
-      <button class="tab-btn" onclick="switchTab('date', this)">Lookup by Date</button>
-      <button class="tab-btn" onclick="switchTab('add', this)">Add New Staff</button>
-    </div>
-  </header>
+    <nav class="nav-list">
+      <button class="nav-btn active" onclick="switchNav('person', this)">
+        <span>&#128100;</span> Lookup by Staff Name
+      </button>
+      <button class="nav-btn" onclick="switchNav('date', this)">
+        <span>&#128197;</span> Lookup by Date
+      </button>
+      <button class="nav-btn" onclick="switchNav('add', this)">
+        <span>&#10133;</span> Add New Staff
+      </button>
+    </nav>
 
-  <!-- TAB 1: LOOKUP BY PERSON -->
-  <section id="panel-person" class="panel active">
-    <div class="card">
-      <div class="controls-row">
-        <div class="field-group">
-          <label for="personSearch">Filter Name</label>
-          <input type="search" id="personSearch" placeholder="Type first or last name..." oninput="populatePersonDropdown()" />
+    <div class="sync-box">
+      <button class="sync-btn" id="syncBtn" onclick="loadHistoryData()">&#8635; Refresh Spreadsheet Data</button>
+      <div class="last-synced" id="lastSynced">Connecting...</div>
+    </div>
+  </aside>
+
+  <!-- Right Analytical Workspace -->
+  <main>
+
+    <!-- SECTION 1: LOOKUP BY STAFF NAME -->
+    <section id="panel-person" class="panel active">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Individual Attendance History</h1>
+          <p class="page-desc">Inspect check-in patterns, total hours, and shift timelines for a specific staff member.</p>
         </div>
-        <div class="field-group">
-          <label for="personSelect">Select Staff Member</label>
-          <select id="personSelect" onchange="renderPersonLogs()"></select>
+
+        <div class="mode-switch">
+          <button class="mode-btn active" id="personVisualBtn" onclick="setPersonMode('visual')">Visual Overview</button>
+          <button class="mode-btn" id="personRawBtn" onclick="setPersonMode('raw')">Raw Data Table</button>
         </div>
-        <div class="field-group">
-          <label for="personDateFilter">Optional Date Filter</label>
-          <input type="date" id="personDateFilter" onchange="renderPersonLogs()" />
-        </div>
-        <button class="clear-btn" onclick="document.getElementById('personDateFilter').value=''; renderPersonLogs();">All Dates</button>
       </div>
 
-      <div id="personSummary"></div>
-      <div id="personLogsContainer"></div>
-    </div>
-  </section>
+      <div class="toolbar-card">
+        <div class="field">
+          <label for="personSearch">Quick Filter</label>
+          <input type="search" id="personSearch" placeholder="Search first or last name..." oninput="populatePersonDropdown()" />
+        </div>
+        <div class="field">
+          <label for="personSelect">Staff Member</label>
+          <select id="personSelect" onchange="renderPersonView()"></select>
+        </div>
+        <div class="field">
+          <label for="personStartDate">From Date (Optional)</label>
+          <input type="date" id="personStartDate" onchange="renderPersonView()" />
+        </div>
+        <div class="field">
+          <label for="personEndDate">To Date (Optional)</label>
+          <input type="date" id="personEndDate" onchange="renderPersonView()" />
+        </div>
+        <div>
+          <button class="btn-secondary" onclick="clearPersonDates()">Reset Dates</button>
+        </div>
+      </div>
 
-  <!-- TAB 2: LOOKUP BY SPECIFIC DATE -->
-  <section id="panel-date" class="panel">
-    <div class="card">
-      <div class="controls-row">
-        <div class="field-group">
+      <div id="personKpis" class="kpi-grid"></div>
+      <div id="personContent"></div>
+    </section>
+
+    <!-- SECTION 2: LOOKUP BY SPECIFIC DATE -->
+    <section id="panel-date" class="panel">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Daily Attendance Breakdown</h1>
+          <p class="page-desc">View everyone who signed in or out on a chosen date along a 24-hour timeline.</p>
+        </div>
+
+        <div class="mode-switch">
+          <button class="mode-btn active" id="dateVisualBtn" onclick="setDateMode('visual')">Visual Timeline</button>
+          <button class="mode-btn" id="dateRawBtn" onclick="setDateMode('raw')">Raw Data Table</button>
+        </div>
+      </div>
+
+      <div class="toolbar-card">
+        <div class="field">
           <label for="datePicker">Select Date</label>
-          <input type="date" id="datePicker" onchange="renderDateLogs()" />
+          <input type="date" id="datePicker" onchange="renderDateView()" />
         </div>
-        <div class="field-group">
-          <label for="dateNameFilter">Filter Name on This Date</label>
-          <input type="search" id="dateNameFilter" placeholder="Optional name filter..." oninput="renderDateLogs()" />
+        <div class="field">
+          <label for="dateNameFilter">Filter Staff on This Date</label>
+          <input type="search" id="dateNameFilter" placeholder="Filter by first or last name..." oninput="renderDateView()" />
+        </div>
+        <div>
+          <button class="btn-secondary" onclick="setDateToday()">Jump to Today</button>
         </div>
       </div>
 
-      <div id="dateSummary"></div>
-      <div id="dateLogsContainer"></div>
-    </div>
-  </section>
+      <div id="dateKpis" class="kpi-grid"></div>
+      <div id="dateContent"></div>
+    </section>
 
-  <!-- TAB 3: ADD NEW STAFF -->
-  <section id="panel-add" class="panel">
-    <div class="card">
-      <h2 style="margin-top:0; font-size:18px;">Add Staff to &ldquo;all staff&rdquo; &amp; Update Roster</h2>
-      <p style="color:var(--muted); font-size:15px; margin-top:4px;">
-        Adds the person to the <strong>all staff</strong> tab and automatically updates and formats the <strong>Roster</strong> tab without erasing existing logs.
-      </p>
+    <!-- SECTION 3: ADD NEW STAFF -->
+    <section id="panel-add" class="panel">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Manage Staff Roster</h1>
+          <p class="page-desc">Add new staff combinations to the <strong>all staff</strong> sheet and sync them to the active <strong>Roster</strong>.</p>
+        </div>
+      </div>
 
-      <form id="addStaffForm" onsubmit="handleAddStaff(event)">
-        <div class="controls-row">
-          <div class="field-group">
-            <label for="newFirstName">First Name</label>
-            <input type="text" id="newFirstName" placeholder="e.g. Jordan" required autocomplete="off" />
-          </div>
-          <div class="field-group">
-            <label for="newLastName">Last Name</label>
-            <input type="text" id="newLastName" placeholder="e.g. Taylor" required autocomplete="off" />
-          </div>
+      <div class="card" style="max-width: 620px;">
+        <div class="card-header">
+          <h2 class="card-title">Add New Person to &ldquo;all staff&rdquo;</h2>
         </div>
 
-        <button type="submit" class="primary-btn" id="addStaffBtn">Add Staff &amp; Sync Roster</button>
-        <div id="addFeedback" class="feedback"></div>
-      </form>
-    </div>
-  </section>
-</div>
+        <form onsubmit="handleAddStaff(event)">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:18px;">
+            <div class="field">
+              <label for="newFirstName">First Name</label>
+              <input type="text" id="newFirstName" placeholder="e.g. Jordan" required autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="newLastName">Last Name</label>
+              <input type="text" id="newLastName" placeholder="e.g. Taylor" required autocomplete="off" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" id="addStaffBtn">Add to &ldquo;all staff&rdquo; &amp; Update Roster</button>
+          <div id="addFeedback" class="feedback"></div>
+        </form>
+      </div>
+    </section>
+
+  </main>
 
 <script>
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzuBXmj7Ou8PMjbP298Rd4sX1qEgOBUJQRZHX46XQYVF2GfSxcNSVdKQGdKovsHCc4EHw/exec';
 
   let staffHistory = [];
+  let personMode = 'visual'; // 'visual' | 'raw'
+  let dateMode = 'visual';     // 'visual' | 'raw'
 
-  // Default date picker to today's local date (YYYY-MM-DD)
   function getTodayISO() {
     const now = new Date();
     const offset = now.getTimezoneOffset() * 60000;
@@ -383,46 +755,152 @@
 
   document.getElementById('datePicker').value = getTodayISO();
 
-  function switchTab(tabName, btn) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  function setDateToday() {
+    document.getElementById('datePicker').value = getTodayISO();
+    renderDateView();
+  }
+
+  function clearPersonDates() {
+    document.getElementById('personStartDate').value = '';
+    document.getElementById('personEndDate').value = '';
+    renderPersonView();
+  }
+
+  function switchNav(section, btn) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById(`panel-${tabName}`).classList.add('active');
+    document.getElementById(`panel-${section}`).classList.add('active');
+  }
+
+  function setPersonMode(mode) {
+    personMode = mode;
+    document.getElementById('personVisualBtn').classList.toggle('active', mode === 'visual');
+    document.getElementById('personRawBtn').classList.toggle('active', mode === 'raw');
+    renderPersonView();
+  }
+
+  function setDateMode(mode) {
+    dateMode = mode;
+    document.getElementById('dateVisualBtn').classList.toggle('active', mode === 'visual');
+    document.getElementById('dateRawBtn').classList.toggle('active', mode === 'raw');
+    renderDateView();
   }
 
   function sortByLastName(a, b) {
-    const lastCmp = a.lastName.localeCompare(b.lastName, undefined, { sensitivity: 'base' });
-    if (lastCmp !== 0) return lastCmp;
-    return a.firstName.localeCompare(b.firstName, undefined, { sensitivity: 'base' });
+    const cmp = a.lastName.localeCompare(b.lastName, undefined, { sensitivity: 'base' });
+    return cmp !== 0 ? cmp : a.firstName.localeCompare(b.firstName, undefined, { sensitivity: 'base' });
+  }
+
+  // Parse "YYYY-MM-DD" + "HH:MM:SS" into a JS Date object
+  function parseTimestamp(dateStr, timeStr) {
+    if (!dateStr || !timeStr) return null;
+    const d = new Date(`${dateStr}T${timeStr}`);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function formatDuration(ms) {
+    if (!ms || ms < 0) return '0m';
+    const totalMins = Math.round(ms / 60000);
+    const hrs = Math.floor(totalMins / 60);
+    const mins = totalMins % 60;
+    return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+  }
+
+  function timeToDayPercent(timeStr) {
+    if (!timeStr) return 0;
+    const [h, m, s] = timeStr.split(':').map(Number);
+    const secs = (h || 0) * 3600 + (m || 0) * 60 + (s || 0);
+    return Math.min(100, Math.max(0, (secs / 86400) * 100));
+  }
+
+  // Pair chronological SIGNED IN / SIGNED OUT logs into sessions
+  function buildSessions(logs) {
+    const sessions = [];
+    let openIn = null;
+
+    logs.forEach(log => {
+      const dt = parseTimestamp(log.date, log.time);
+      if (log.action === 'SIGNED IN') {
+        if (openIn) {
+          // Previous sign-in never had a sign-out before next sign-in
+          sessions.push({
+            date: openIn.date,
+            inTime: openIn.time,
+            outTime: null,
+            durationMs: null,
+            ongoing: false
+          });
+        }
+        openIn = { ...log, dt };
+      } else if (log.action === 'SIGNED OUT') {
+        if (openIn) {
+          const dur = (dt && openIn.dt && dt >= openIn.dt) ? (dt - openIn.dt) : null;
+          sessions.push({
+            date: openIn.date,
+            inTime: openIn.time,
+            outTime: log.time,
+            durationMs: dur,
+            ongoing: false
+          });
+          openIn = null;
+        } else {
+          sessions.push({
+            date: log.date,
+            inTime: null,
+            outTime: log.time,
+            durationMs: null,
+            ongoing: false
+          });
+        }
+      }
+    });
+
+    if (openIn) {
+      const now = new Date();
+      const isToday = openIn.date === getTodayISO();
+      const dur = (isToday && openIn.dt && now >= openIn.dt) ? (now - openIn.dt) : null;
+      sessions.push({
+        date: openIn.date,
+        inTime: openIn.time,
+        outTime: isToday ? 'Active now' : 'No sign-out',
+        durationMs: dur,
+        ongoing: isToday
+      });
+    }
+
+    return sessions;
   }
 
   async function loadHistoryData() {
-    const refreshBtn = document.getElementById('refreshBtn');
-    refreshBtn.disabled = true;
-    refreshBtn.textContent = 'Loading...';
+    const syncBtn = document.getElementById('syncBtn');
+    const lastSynced = document.getElementById('lastSynced');
+    syncBtn.disabled = true;
+    syncBtn.textContent = 'Syncing...';
 
     try {
       const res = await fetch(`${SCRIPT_URL}?action=history`);
       const json = await res.json();
-      if (json.status !== 'success') throw new Error(json.message || 'Failed to load data');
+      if (json.status !== 'success') throw new Error(json.message || 'Unable to fetch data');
 
       staffHistory = json.data.sort(sortByLastName);
+      lastSynced.textContent = `Updated ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
       populatePersonDropdown();
-      renderDateLogs();
+      renderDateView();
     } catch (err) {
-      document.getElementById('personLogsContainer').innerHTML =
-        `<div class="empty-state">Error loading spreadsheet: ${err.message}</div>`;
-      console.error(err);
+      lastSynced.textContent = 'Sync error';
+      document.getElementById('personContent').innerHTML =
+        `<div class="card empty-state">Error connecting to Google Sheet: ${err.message}</div>`;
     } finally {
-      refreshBtn.disabled = false;
-      refreshBtn.textContent = 'Refresh Data';
+      syncBtn.disabled = false;
+      syncBtn.textContent = '↻ Refresh Spreadsheet Data';
     }
   }
 
   function populatePersonDropdown() {
     const query = document.getElementById('personSearch').value.trim().toLowerCase();
     const select = document.getElementById('personSelect');
-    const previousCol = select.value;
+    const prev = select.value;
 
     const matches = staffHistory.filter(p => {
       if (!query) return true;
@@ -435,11 +913,8 @@
 
     select.innerHTML = '';
     if (matches.length === 0) {
-      const opt = document.createElement('option');
-      opt.textContent = 'No matching staff';
-      opt.value = '';
-      select.appendChild(opt);
-      renderPersonLogs();
+      select.innerHTML = '<option value="">No matching staff</option>';
+      renderPersonView();
       return;
     }
 
@@ -450,152 +925,366 @@
       select.appendChild(opt);
     });
 
-    if (matches.some(m => String(m.col) === String(previousCol))) {
-      select.value = previousCol;
+    if (matches.some(m => String(m.col) === String(prev))) {
+      select.value = prev;
     }
 
-    renderPersonLogs();
+    renderPersonView();
   }
 
-  function renderPersonLogs() {
+  /* =========================================================
+     VIEW 1: BY PERSON (VISUAL OVERVIEW & RAW DATA)
+     ========================================================= */
+  function renderPersonView() {
     const colVal = document.getElementById('personSelect').value;
-    const dateFilter = document.getElementById('personDateFilter').value;
-    const summaryEl = document.getElementById('personSummary');
-    const containerEl = document.getElementById('personLogsContainer');
+    const startDate = document.getElementById('personStartDate').value;
+    const endDate = document.getElementById('personEndDate').value;
+    const kpiEl = document.getElementById('personKpis');
+    const contentEl = document.getElementById('personContent');
 
     const person = staffHistory.find(p => String(p.col) === String(colVal));
     if (!person) {
-      summaryEl.innerHTML = '';
-      containerEl.innerHTML = '<div class="empty-state">Select a staff member to view history.</div>';
+      kpiEl.innerHTML = '';
+      contentEl.innerHTML = '<div class="card empty-state">Select a staff member above.</div>';
       return;
     }
 
-    const isIn = person.status === 'signed in';
-    let logs = [...person.logs].reverse(); // Most recent first
-    if (dateFilter) {
-      logs = logs.filter(l => l.date === dateFilter);
-    }
+    const filteredLogs = person.logs.filter(log => {
+      if (startDate && log.date < startDate) return false;
+      if (endDate && log.date > endDate) return false;
+      return true;
+    });
 
-    summaryEl.innerHTML = `
-      <div class="summary-bar">
-        <div>
-          <div class="person-title">${person.lastName}, ${person.firstName}</div>
-          <div style="font-size:13px; color:var(--muted); margin-top:2px;">
-            Showing ${logs.length} ${logs.length === 1 ? 'event' : 'events'}${dateFilter ? ` on ${dateFilter}` : ' total'}
-          </div>
+    const sessions = buildSessions(filteredLogs);
+    const totalMs = sessions.reduce((acc, s) => acc + (s.durationMs || 0), 0);
+    const completedSessions = sessions.filter(s => s.durationMs !== null);
+    const avgMs = completedSessions.length > 0 ? totalMs / completedSessions.length : 0;
+    const signInCount = filteredLogs.filter(l => l.action === 'SIGNED IN').length;
+    const isIn = person.status === 'signed in';
+
+    kpiEl.innerHTML = `
+      <div class="kpi-card">
+        <div class="kpi-label">Current Status</div>
+        <div class="kpi-value" style="font-size:20px; margin-top:10px;">
+          <span class="badge ${isIn ? 'in' : 'out'}">${person.status}</span>
         </div>
-        <span class="badge ${isIn ? 'in' : 'out'}">Currently ${person.status}</span>
+        <div class="kpi-sub">${person.lastName}, ${person.firstName}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total Sign-Ins</div>
+        <div class="kpi-value">${signInCount}</div>
+        <div class="kpi-sub">${filteredLogs.length} total log entries</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total Logged Time</div>
+        <div class="kpi-value">${formatDuration(totalMs)}</div>
+        <div class="kpi-sub">Across ${completedSessions.length} timed shifts</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Average Shift</div>
+        <div class="kpi-value">${formatDuration(avgMs)}</div>
+        <div class="kpi-sub">Per completed session</div>
       </div>
     `;
 
-    if (logs.length === 0) {
-      containerEl.innerHTML = '<div class="empty-state">No sign-in or sign-out records found for this selection.</div>';
+    if (filteredLogs.length === 0) {
+      contentEl.innerHTML = '<div class="card empty-state">No activity recorded for this person in the selected date range.</div>';
       return;
     }
 
-    let rowsHtml = logs.map(log => {
-      const badgeClass = log.action === 'SIGNED IN' ? 'in' : 'out';
-      return `
+    if (personMode === 'raw') {
+      const reversedLogs = [...filteredLogs].reverse();
+      const rows = reversedLogs.map((l, idx) => `
         <tr>
-          <td><span class="badge ${badgeClass}">${log.action}</span></td>
-          <td>${log.date || '—'}</td>
-          <td>${log.time || log.raw}</td>
+          <td>${reversedLogs.length - idx}</td>
+          <td><span class="badge ${l.action === 'SIGNED IN' ? 'in' : 'out'}">${l.action}</span></td>
+          <td>${l.date || '—'}</td>
+          <td>${l.time || '—'}</td>
+          <td style="color:var(--muted); font-family:monospace;">${l.raw}</td>
         </tr>
+      `).join('');
+
+      contentEl.innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Raw Spreadsheet Entries (${filteredLogs.length})</h2>
+            <button class="btn-secondary" onclick="exportPersonCsv()">Download CSV</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Event</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Raw Cell Value</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+      return;
+    }
+
+    // VISUAL MODE: Daily Hours Bar Chart + Shift Timeline Cards
+    const dailyTotals = {};
+    sessions.forEach(s => {
+      if (!dailyTotals[s.date]) dailyTotals[s.date] = 0;
+      dailyTotals[s.date] += (s.durationMs || 0);
+    });
+
+    const sortedDates = Object.keys(dailyTotals).sort().slice(-14); // Last 14 active dates
+    const maxHrs = Math.max(1, ...sortedDates.map(d => dailyTotals[d] / 3600000));
+
+    const barsHtml = sortedDates.map(dateStr => {
+      const hrs = dailyTotals[dateStr] / 3600000;
+      const pct = Math.max(4, Math.round((hrs / maxHrs) * 100));
+      const shortDate = dateStr.slice(5); // MM-DD
+      return `
+        <div class="bar-col">
+          <div class="bar-val">${hrs > 0 ? hrs.toFixed(1) + 'h' : '—'}</div>
+          <div class="bar-fill" style="height:${pct}%;"></div>
+          <div class="bar-date">${shortDate}</div>
+        </div>
       `;
     }).join('');
 
-    containerEl.innerHTML = `
-      <table>
-        <thead>
-          <tr>
-            <th>Action</th>
-            <th>Date</th>
-            <th>Time</th>
-          </tr>
-        </thead>
-        <tbody>${rowsHtml}</tbody>
-      </table>
+    const recentSessions = [...sessions].reverse();
+    const sessionCardsHtml = recentSessions.map(s => {
+      const startPct = s.inTime ? timeToDayPercent(s.inTime) : 0;
+      const endPct = (s.outTime && s.outTime.includes(':'))
+        ? timeToDayPercent(s.outTime)
+        : (s.ongoing ? timeToDayPercent(new Date().toTimeString().slice(0, 8)) : Math.min(100, startPct + 2));
+      const widthPct = Math.max(2, endPct - startPct);
+
+      return `
+        <div class="session-row">
+          <div class="session-date">${s.date}</div>
+          <div class="session-track-wrap">
+            <div class="session-times">
+              <span><strong>In:</strong> ${s.inTime || 'Missing'}</span>
+              <span><strong>Out:</strong> ${s.outTime || 'Missing'}</span>
+            </div>
+            <div class="timeline-rail">
+              <div class="timeline-segment ${s.ongoing ? 'ongoing' : ''}" style="left:${startPct}%; width:${widthPct}%;"></div>
+            </div>
+          </div>
+          <div class="session-duration">
+            ${s.ongoing ? '<span class="badge active-now">Active</span>' : (s.durationMs !== null ? formatDuration(s.durationMs) : '—')}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    contentEl.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Hours Logged by Day (Recent Active Days)</h2>
+        </div>
+        <div class="bar-chart">${barsHtml}</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Shift Timeline (${sessions.length} ${sessions.length === 1 ? 'Session' : 'Sessions'})</h2>
+          <span style="font-size:12px; color:var(--muted);">Bar position represents 12:00 AM &ndash; 11:59 PM</span>
+        </div>
+        <div class="session-list">${sessionCardsHtml}</div>
+      </div>
     `;
   }
 
-  function renderDateLogs() {
+  /* =========================================================
+     VIEW 2: BY SPECIFIC DATE (24-HOUR GANTT & RAW DATA)
+     ========================================================= */
+  function renderDateView() {
     const selectedDate = document.getElementById('datePicker').value;
-    const nameQuery = document.getElementById('dateNameFilter').value.trim().toLowerCase();
-    const summaryEl = document.getElementById('dateSummary');
-    const containerEl = document.getElementById('dateLogsContainer');
+    const query = document.getElementById('dateNameFilter').value.trim().toLowerCase();
+    const kpiEl = document.getElementById('dateKpis');
+    const contentEl = document.getElementById('dateContent');
 
     if (!selectedDate) {
-      summaryEl.innerHTML = '';
-      containerEl.innerHTML = '<div class="empty-state">Choose a date above to view activity.</div>';
+      kpiEl.innerHTML = '';
+      contentEl.innerHTML = '<div class="card empty-state">Select a date above.</div>';
       return;
     }
 
-    const events = [];
-    staffHistory.forEach(person => {
-      const fullName = `${person.firstName} ${person.lastName}`.toLowerCase();
-      const revName = `${person.lastName}, ${person.firstName}`.toLowerCase();
-      if (nameQuery && !fullName.includes(nameQuery) && !revName.includes(nameQuery)) {
-        return;
-      }
+    const dailyPeople = [];
+    const rawEvents = [];
 
-      person.logs.forEach(log => {
-        if (log.date === selectedDate) {
-          events.push({
-            lastName: person.lastName,
-            firstName: person.firstName,
-            action: log.action,
-            time: log.time
-          });
-        }
+    staffHistory.forEach(person => {
+      const full = `${person.firstName} ${person.lastName}`.toLowerCase();
+      const rev = `${person.lastName}, ${person.firstName}`.toLowerCase();
+      if (query && !full.includes(query) && !rev.includes(query)) return;
+
+      const dayLogs = person.logs.filter(l => l.date === selectedDate);
+      if (dayLogs.length === 0) return;
+
+      dayLogs.forEach(l => {
+        rawEvents.push({
+          lastName: person.lastName,
+          firstName: person.firstName,
+          action: l.action,
+          time: l.time,
+          raw: l.raw
+        });
+      });
+
+      const sessions = buildSessions(dayLogs);
+      const totalMs = sessions.reduce((acc, s) => acc + (s.durationMs || 0), 0);
+      dailyPeople.push({
+        person,
+        sessions,
+        totalMs
       });
     });
 
-    // Sort chronologically by time
-    events.sort((a, b) => a.time.localeCompare(b.time));
+    rawEvents.sort((a, b) => a.time.localeCompare(b.time));
 
-    const uniquePeopleCount = new Set(events.map(e => `${e.lastName}|${e.firstName}`)).size;
+    const totalSignIns = rawEvents.filter(e => e.action === 'SIGNED IN').length;
+    const totalSignOuts = rawEvents.filter(e => e.action === 'SIGNED OUT').length;
+    const combinedMs = dailyPeople.reduce((acc, p) => acc + p.totalMs, 0);
 
-    summaryEl.innerHTML = `
-      <div class="summary-bar">
-        <div>
-          <div class="person-title">Activity for ${selectedDate}</div>
-          <div style="font-size:13px; color:var(--muted); margin-top:2px;">
-            ${events.length} total ${events.length === 1 ? 'event' : 'events'} across ${uniquePeopleCount} ${uniquePeopleCount === 1 ? 'person' : 'people'}
-          </div>
+    kpiEl.innerHTML = `
+      <div class="kpi-card">
+        <div class="kpi-label">Selected Date</div>
+        <div class="kpi-value" style="font-size:22px;">${selectedDate}</div>
+        <div class="kpi-sub">${dailyPeople.length} staff active</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Sign-Ins Recorded</div>
+        <div class="kpi-value">${totalSignIns}</div>
+        <div class="kpi-sub">${totalSignOuts} sign-outs recorded</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Combined Staff Hours</div>
+        <div class="kpi-value">${formatDuration(combinedMs)}</div>
+        <div class="kpi-sub">Total tracked duration</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">First / Last Activity</div>
+        <div class="kpi-value" style="font-size:20px;">
+          ${rawEvents.length ? rawEvents[0].time.slice(0, 5) : '—'}
+        </div>
+        <div class="kpi-sub">
+          ${rawEvents.length ? `Last event at ${rawEvents[rawEvents.length - 1].time.slice(0, 5)}` : 'No events'}
         </div>
       </div>
     `;
 
-    if (events.length === 0) {
-      containerEl.innerHTML = `<div class="empty-state">No sign-ins or sign-outs recorded on ${selectedDate}.</div>`;
+    if (rawEvents.length === 0) {
+      contentEl.innerHTML = `<div class="card empty-state">No sign-in or sign-out records found for ${selectedDate}.</div>`;
       return;
     }
 
-    const rowsHtml = events.map(ev => {
-      const badgeClass = ev.action === 'SIGNED IN' ? 'in' : 'out';
-      return `
+    if (dateMode === 'raw') {
+      const rows = rawEvents.map(ev => `
         <tr>
           <td><strong>${ev.lastName}</strong>, ${ev.firstName}</td>
-          <td><span class="badge ${badgeClass}">${ev.action}</span></td>
+          <td><span class="badge ${ev.action === 'SIGNED IN' ? 'in' : 'out'}">${ev.action}</span></td>
           <td>${ev.time}</td>
+          <td style="color:var(--muted); font-family:monospace;">${ev.raw}</td>
         </tr>
+      `).join('');
+
+      contentEl.innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Raw Event Log for ${selectedDate} (${rawEvents.length} Events)</h2>
+            <button class="btn-secondary" onclick="exportDateCsv()">Download CSV</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Staff Member</th>
+                <th>Event</th>
+                <th>Time</th>
+                <th>Raw Cell Value</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+      return;
+    }
+
+    // VISUAL MODE: 24-Hour Horizontal Presence Timeline
+    const ganttRowsHtml = dailyPeople.map(({ person, sessions, totalMs }) => {
+      const blocksHtml = sessions.map(s => {
+        const startPct = s.inTime ? timeToDayPercent(s.inTime) : 0;
+        const endPct = (s.outTime && s.outTime.includes(':'))
+          ? timeToDayPercent(s.outTime)
+          : (s.ongoing ? timeToDayPercent(new Date().toTimeString().slice(0, 8)) : Math.min(100, startPct + 1.5));
+        const widthPct = Math.max(1.2, endPct - startPct);
+        const tooltip = `${s.inTime || '?'} → ${s.outTime || '?'}`;
+
+        return `<div class="gantt-block ${s.ongoing ? 'ongoing' : ''}" title="${tooltip}" style="left:${startPct}%; width:${widthPct}%;"></div>`;
+      }).join('');
+
+      return `
+        <div class="gantt-row">
+          <div class="gantt-name">${person.lastName}, ${person.firstName}</div>
+          <div class="gantt-bar-area">${blocksHtml}</div>
+          <div class="gantt-total">${totalMs > 0 ? formatDuration(totalMs) : 'Active'}</div>
+        </div>
       `;
     }).join('');
 
-    containerEl.innerHTML = `
-      <table>
-        <thead>
-          <tr>
-            <th>Staff Member</th>
-            <th>Action</th>
-            <th>Time</th>
-          </tr>
-        </thead>
-        <tbody>${rowsHtml}</tbody>
-      </table>
+    contentEl.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">24-Hour Presence Timeline (${selectedDate})</h2>
+          <span style="font-size:12px; color:var(--muted);">Hover over any green/blue block for exact times</span>
+        </div>
+        <div class="gantt-header">
+          <div>Staff Member</div>
+          <div class="gantt-hours">
+            <span>12a</span><span>4a</span><span>8a</span><span>12p</span><span>4p</span><span>8p</span><span>12a</span>
+          </div>
+          <div style="text-align:right;">Total</div>
+        </div>
+        <div>${ganttRowsHtml}</div>
+      </div>
     `;
   }
 
+  /* =========================================================
+     CSV EXPORTS FOR RAW DATA MODE
+     ========================================================= */
+  function downloadCsv(filename, rows) {
+    const csvContent = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+  }
+
+  function exportPersonCsv() {
+    const colVal = document.getElementById('personSelect').value;
+    const person = staffHistory.find(p => String(p.col) === String(colVal));
+    if (!person) return;
+    const rows = [['Last Name', 'First Name', 'Action', 'Date', 'Time', 'Raw Entry']];
+    person.logs.forEach(l => rows.push([person.lastName, person.firstName, l.action, l.date, l.time, l.raw]));
+    downloadCsv(`${person.lastName}_${person.firstName}_logs.csv`, rows);
+  }
+
+  function exportDateCsv() {
+    const selectedDate = document.getElementById('datePicker').value;
+    const rows = [['Date', 'Last Name', 'First Name', 'Action', 'Time', 'Raw Entry']];
+    staffHistory.forEach(p => {
+      p.logs.filter(l => l.date === selectedDate).forEach(l => {
+        rows.push([selectedDate, p.lastName, p.firstName, l.action, l.time, l.raw]);
+      });
+    });
+    downloadCsv(`attendance_${selectedDate}.csv`, rows);
+  }
+
+  /* =========================================================
+     ADD NEW STAFF TO 'all staff' & SYNC ROSTER
+     ========================================================= */
   async function handleAddStaff(e) {
     e.preventDefault();
     const firstInput = document.getElementById('newFirstName');
@@ -610,7 +1299,6 @@
     btn.disabled = true;
     btn.textContent = 'Adding & Syncing Roster...';
     feedback.className = 'feedback';
-    feedback.textContent = '';
 
     try {
       const res = await fetch(SCRIPT_URL, {
@@ -629,20 +1317,14 @@
       feedback.textContent = json.message;
       firstInput.value = '';
       lastInput.value = '';
-
-      // Reload history so the new person immediately appears in dropdowns
       await loadHistoryData();
     } catch (err) {
       feedback.className = 'feedback error';
       feedback.textContent = err.message;
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Add Staff & Sync Roster';
+      btn.textContent = 'Add to "all staff" & Update Roster';
     }
-  }
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 
   loadHistoryData();
